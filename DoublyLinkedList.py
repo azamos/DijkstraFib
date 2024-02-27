@@ -1,26 +1,31 @@
 class DLLNode:#is a DLL Node.
-    def __init__(self,value,next = None) -> None:
+    def __init__(self,value,key,next = None) -> None:
         self.value = value
+        self.key = key
         self.next = None
         self.prev = None
 class DLL:
-    def __init__(self,first = None) -> None:
-        self.head = first
+    def __init__(self) -> None:
+        self.start = None
+        self.end = None
         self.nodes = {}
-    def addNode(self,newNode):
-        if self.head is None:
-            self.head = newNode
+    def addNode(self,value,key):
+        if key in self.nodes:
+            raise ValueError("DLL node with such key already exist.")
+        newNode = DLLNode(value=value,key=key)
+        if self.start is None:
+            self.start = self.end = newNode
         else:
-            self.head.next = newNode
-            newNode.prev = self.head
-            self.head = newNode
-        self.nodes[newNode.value.id] = newNode
+            self.end.next = newNode
+            newNode.prev = self.end
+            self.end = newNode
+        self.nodes[key] = newNode
     def _find_node_(self,id):
-        if id not in self.nodes.keys():
+        if id not in self.nodes:
             return None
         return self.nodes[id]
     
-    def _delete_node_(self,id)->DLLNode:
+    def delete_node(self,id)->DLLNode:
         node = self._find_node_(id)
         if node is None:
             return None
@@ -57,4 +62,5 @@ class DLL:
             next_node = node.next
             node.next = None
             next_node.prev = None
+        del self.nodes[node.id]
         return node

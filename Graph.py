@@ -8,11 +8,11 @@ class Graph:
         self.edges = {}
         
     def addEdge(self,u,v,weight = 0):
-        self.vertices[u-1].neighbours.addNode(DLLNode(Vertex(v)))
+        self.vertices[u-1].neighbours.addNode(value = Vertex(v),key = v)
         self.edges[(self.vertices[u-1].id,self.vertices[v-1].id)] = weight
         self.m+=1
         if self.directed is False:
-            self.vertices[v-1].neighbours.addNode(DLLNode(Vertex(u)))
+            self.vertices[v-1].neighbours.addNode(value = Vertex(u),key = u)
             self.edges[(self.vertices[v-1].id,self.vertices[u-1].id)] = weight
             m+=1
     
