@@ -1,3 +1,4 @@
+from DoublyLinkedList import *
 class TreeNode:
     def __init__(self,key,value) -> None:
         self.key = key
@@ -8,27 +9,18 @@ class TreeNode:
         self.parent = None
         self.marked = False
 
-class FibTree:
-    def __init__(self,key,value) -> None:
-        self.root = TreeNode(key=key,value=value)
-
 class FibonacciHeap:
     def __init__(self) -> None:
-        self.roots_head = None
+        self.roots = DLL()
         self.Min = None
         self.table = {}
 
     def insert(self,key,value):
-        newTree = FibTree(key=key,value=value)
-        if self.roots_head is None:
-            self.roots_head = newTree
-        else:
-            self.roots_head.next = newTree
-            newTree.prev = self.roots_head
-            self.roots_head = newTree
+        newNode = TreeNode(key=key,value=value)
+        self.roots.addNode(newNode)
+        self.table[key] = newNode
         if self.Min is None or self.Min.key > key:
-            self.Min = newTree
-        self.table[key] = newTree
+            self.Min = newNode
     
     def GetMin(self):
         return self.Min
