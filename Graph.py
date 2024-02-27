@@ -1,11 +1,12 @@
 class DLLNode:#is a DLL Node.
     def __init__(self,value,next = None) -> None:
-        self.value = value#maybe value should be a pointer to a Vertex()
+        self.value = value
         self.next = None
         self.prev = None
 class DLL:
     def __init__(self,first = None) -> None:
         self.head = first
+        self.nodes = {}
     def addNode(self,newNode):
         if self.head is None:
             self.head = newNode
@@ -13,13 +14,11 @@ class DLL:
             self.head.next = newNode
             newNode.prev = self.head
             self.head = newNode
+        self.nodes[newNode.value.id] = newNode
     def _find_node_(self,id):
-        p = self.head
-        while p is not None:
-            if p.value.id == id:
-                return p
-            p = p.prev
-        return None
+        if id not in self.nodes.keys():
+            return None
+        return self.nodes[id]
     
     def _delete_node_(self,id)->DLLNode:
         node = self._find_node_(id)
@@ -65,7 +64,8 @@ class Graph:
         self.m = 0
         self.directed = directed
         self.vertices = [ Vertex(i) for i in range(1,n+1)]
-        self.edges = {}#todo: swich to dict implementation of edges. say {(1,2):w(1,2),(1,5):w:(1,5)} and so forth
+        self.edges = {}
+        
     def addEdge(self,u,v,weight = 0):
         self.vertices[u-1].neighbours.addNode(DLLNode(Vertex(v)))
         self.edges[(self.vertices[u-1].id,self.vertices[v-1].id)] = weight
@@ -101,3 +101,21 @@ class Vertex:
         self.PI = None#from which other vertex the edge to this one came
         self.neighbours = DLL()#specifies the edges
         self.id =  index
+
+def test_directed_graph():
+    # Create a directed graph with 10 vertices
+    directed_graph = Graph(10, directed=True)
+
+    # Add all possible directed edges
+    for u in range(1, 11):
+        for v in range(1, 11):
+            if u != v:
+                directed_graph.addEdge(u, v, weight=1)  # Adding directed edges with weight 1
+
+    return directed_graph
+
+directed_graph = test_directed_graph()
+
+# Print the directed graph
+directed_graph.printGraph()
+
