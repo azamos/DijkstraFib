@@ -10,11 +10,11 @@ class TreeNode:
         self.parent = None
         self.marked = False
 
-    def print_subtree(self):
-        print(f"{self.key}\n")
+    def print_subtree(self,depth):
+        print(f"\n depth = {depth},key = {self.key}, {'ROOT' if not self.parent else f'son of {self.parent.key}'}")
         p = self.children.start
         while p is not None:
-            p.value.print_subtree()
+            p.value.print_subtree(depth+1)
             p = p.next
 
 class FibonacciHeap:
@@ -80,16 +80,17 @@ class FibonacciHeap:
             treeRoot2.children.addNode(value = treeRoot1,key = treeRoot1.key)
             return treeRoot2
     
-    def consolidate(self,N):
-        degree_array = [None for _ in range(ceil(log(N,2)))]
-        p = self.roots.head
+    def consolidate(self):
+        degree_array = [None for _ in range(ceil(log(self.N,2)))]
+        p = self.roots.start
         while p is not None:
             treeNode = p.value
-            degree = len(treeNode.children)
-            if degree_array[degree-1] is None:
-                degree_array[degree-1] = treeNode
+            next = p.next
+            degree = len(treeNode.children.nodes)
+            if degree_array[degree] is None:
+                degree_array[degree] = treeNode
             else:#merge trees, add merged result to the end of the list, and remove the 2 original ones
-                other_tree = degree_array[degree-1]
+                other_tree = degree_array[degree]
                 merged_tree = self.merge_trees(treeNode,other_tree)
                 self.roots.delete_node(treeNode.key)
                 self.roots.delete_node(other_tree.key)
@@ -98,9 +99,9 @@ class FibonacciHeap:
                 self.roots.addNode(value=merged_tree,key=merged_tree.key)
                 self.table[merged_tree.key] = merged_tree
 
-                degree_array[degree-1] = None
-                degree_array[len(merged_tree.children)-1] = merged_tree
-            p = p.next
+                degree_array[degree] = None
+                #degree_array[len(merged_tree.children.nodes)] = merged_tree
+            p = next
     
     def ExtractMin(self):
         result = self.Min
@@ -135,14 +136,16 @@ class FibonacciHeap:
         self.roots.delete_node(result.key)
         del self.table[result.key]
         self.Min = temp#Updating the new minimu
+        self.N-=1
+        self.consolidate()
         return result.key
     
     def print_heap(self):
         for key in self.table:
-            self.table[key].print_subtree()
+            self.table[key].print_subtree(0)
 
 dijkstra_queue = FibonacciHeap()
-for i in range(20):
+for i in range(10):
     dijkstra_queue.insert(key=i+1)
 #dijkstra_queue.print_heap()
 print(f"Extracted Min = {dijkstra_queue.ExtractMin()}")
