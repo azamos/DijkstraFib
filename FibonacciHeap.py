@@ -117,7 +117,7 @@ class FibonacciHeap:
             if temp is None:
                 if treeNode is not self.Min:
                     temp = treeNode
-            elif temp.key > treeNode.key:
+            elif temp.key > treeNode.key and treeNode is not result:
                 temp = treeNode
             root_traverser = root_traverser.next
 
@@ -130,8 +130,10 @@ class FibonacciHeap:
             next = p.next
             if treeNode.marked:
                 treeNode.marked = False
-            result.children.delete_node(p)
-            self.roots.addNode(p)
+            result.children.delete_node(p.key)
+            link = self.roots.addNode(value=p.value,key=p.key)
+            #FORGOT to add to roots table?Attempted fix
+            self.table[p.key] = link
             p = next
         self.roots.delete_node(result.key)
         del self.table[result.key]
@@ -145,9 +147,12 @@ class FibonacciHeap:
             self.table[key].print_subtree(0)
 
 dijkstra_queue = FibonacciHeap()
-for i in range(10):
+for i in range(16):
     dijkstra_queue.insert(key=i+1)
 #dijkstra_queue.print_heap()
+print(f"Extracted Min = {dijkstra_queue.ExtractMin()}")
+print(f"New Min = {dijkstra_queue.GetMin().key}")
+dijkstra_queue.print_heap()
 print(f"Extracted Min = {dijkstra_queue.ExtractMin()}")
 print(f"New Min = {dijkstra_queue.GetMin().key}")
 dijkstra_queue.print_heap()

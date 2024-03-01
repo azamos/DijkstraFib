@@ -48,7 +48,7 @@ class DLL:
             next_node.prev = prev_node
         #case2:
         elif node.prev is None and node.next is None:
-            self.start = self.head = None
+            self.start = self.end = None
         #case3:
         elif node.prev is not None and node.next is None:
             #need to make the node not point to its prev anymore,
