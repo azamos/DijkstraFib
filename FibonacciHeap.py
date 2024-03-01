@@ -113,7 +113,10 @@ class FibonacciHeap:
             #The if bellow makes sure to update temp only if 
             #it temp is None and the current DLL node is not the Min.
             #If we do encounter the Min, then it must be removed. Idiotic.
-            if temp is None and treeNode is not self.Min or temp.key > treeNode.key:
+            if temp is None:
+                if treeNode is not self.Min:
+                    temp = treeNode
+            elif temp.key > treeNode.key:
                 temp = treeNode
             root_traverser = root_traverser.next
 
@@ -129,7 +132,8 @@ class FibonacciHeap:
             result.children.delete_node(p)
             self.roots.addNode(p)
             p = next
-
+        self.roots.delete_node(result.key)
+        del self.table[result.key]
         self.Min = temp#Updating the new minimu
         return result.key
     
@@ -140,4 +144,7 @@ class FibonacciHeap:
 dijkstra_queue = FibonacciHeap()
 for i in range(20):
     dijkstra_queue.insert(key=i+1)
+#dijkstra_queue.print_heap()
+print(f"Extracted Min = {dijkstra_queue.ExtractMin()}")
+print(f"New Min = {dijkstra_queue.GetMin().key}")
 dijkstra_queue.print_heap()

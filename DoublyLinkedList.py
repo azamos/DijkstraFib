@@ -20,6 +20,7 @@ class DLL:
             newNode.prev = self.end
             self.end = newNode
         self.nodes[key] = newNode
+        return newNode#for FibHeap
     def _find_node_(self,id):
         if id not in self.nodes:
             return None
@@ -47,7 +48,7 @@ class DLL:
             next_node.prev = prev_node
         #case2:
         elif node.prev is None and node.next is None:
-            self.head = None
+            self.start = self.head = None
         #case3:
         elif node.prev is not None and node.next is None:
             #need to make the node not point to its prev anymore,
@@ -55,14 +56,15 @@ class DLL:
             prev_node = node.prev
             node.prev = None
             prev_node.next = None
-            self.head = prev_node
+            self.end = self.start = prev_node
         #case 4, final case:
         elif node.prev is None and node.next is not None:
             #here, I just need to disconnect the first node from the second node 
             next_node = node.next
             node.next = None
             next_node.prev = None
-        del self.nodes[node.id]
+            self.start = next_node
+        del self.nodes[id]
         return node
     
     def print_list(self):
