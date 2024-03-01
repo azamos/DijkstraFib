@@ -64,3 +64,9 @@ class DLL:
             next_node.prev = None
         del self.nodes[node.id]
         return node
+    
+    def print_list(self):
+        p = self.start
+        while p is not None:
+            print(f"{p.key}, ")
+            p = p.next
