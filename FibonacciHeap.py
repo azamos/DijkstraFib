@@ -21,13 +21,15 @@ class FibonacciHeap:
     def __init__(self) -> None:
         self.roots = DLL()
         self.Min = None
-        self.table = {}
+        self.roots_table = {}
+        self.allnodes = {}
         self.N = 0
 
     def insert(self,key):
         newNode = TreeNode(key=key)
         self.roots.addNode(value=newNode,key=key)
-        self.table[key] = newNode
+        self.roots_table[key] = newNode
+        self.allnodes[key] = newNode
         if self.Min is None or self.Min.key > key:
             self.Min = newNode
         self.N+=1
@@ -35,28 +37,41 @@ class FibonacciHeap:
     def GetMin(self):
         return self.Min
     
-    def DecreaseKey(self,key,newKey):
-        if newKey > key:
+    def DecreaseKey(self,oldKey,newKey):
+        #error cases
+        if newKey > oldKey:
             raise ValueError("New key > old key. If you wish to decrease by newKey, simply pass key-newKey as the argument.")
-        node = self.table[key]
-        if node.parent is not None:
-            if node.parent.marked is True:
-                self.cut(node)
-                self.cascading_cut(node.parent)
-            else:
-                node.parent.marked = True
+        if newKey in self.allnodes:
+            raise ValueError("There's already a node with key = newKey. Pick another...")
+        #accessing and updating node's key, and updating minimum
+        node = self.allnodes[oldKey]
         node.key = newKey
-        del self.table[key]
-        self.table[newKey] = node
-        if node.key < self.Min.key:
+        if newKey < self.Min.key:
             self.Min = node
+        #deleting references to the node which rely on its old key, and updating them
+        #to be according to the new key
+        del self.allnodes[oldKey]
+        self.allnodes[newKey] = node
+        if oldKey in self.roots_table:#if it was a root, also need to update roots_table reference
+            del self.roots_table[oldKey]
+            self.roots_table[newKey] = node
+        #Lastly, if the heap propery is broken, i.e. if the newKey is smaller than that of
+        #the parent, then the subtree starting at the node must be removed from its parent
+        #and then must be added as a new root,
+        #and this may potentialy lead to a cascading cut, if the parent
+        #has already lost another child.
+        if node.parent and oldKey < node.parent.key:#TODO: consider changing it to <=
+            self.cut(node)
+            self.cascading_cut(node.parent)
 
     def cut(self,node):
+        if self.node.parent is None:
+            return
         node.parent.children.delete_node(node.key)
         node.parent = None
         node.marked = False
-        self.roots.addNode(node,node.key)
-        self.table[node.key] = node
+        link = self.roots.addNode(node,node.key)
+        self.roots_table[node.key] = link
 
     def cascading_cut(self,node):
         if not node.marked:
@@ -94,10 +109,10 @@ class FibonacciHeap:
                 merged_tree = self.merge_trees(treeNode,other_tree)
                 self.roots.delete_node(treeNode.key)
                 self.roots.delete_node(other_tree.key)
-                del self.table[treeNode.key]
-                del self.table[other_tree.key]
+                del self.roots_table[treeNode.key]
+                del self.roots_table[other_tree.key]
                 self.roots.addNode(value=merged_tree,key=merged_tree.key)
-                self.table[merged_tree.key] = merged_tree
+                self.roots_table[merged_tree.key] = merged_tree
 
                 degree_array[degree] = None
                 #degree_array[len(merged_tree.children.nodes)] = merged_tree
@@ -133,18 +148,19 @@ class FibonacciHeap:
             result.children.delete_node(p.key)
             link = self.roots.addNode(value=p.value,key=p.key)
             #FORGOT to add to roots table?Attempted fix
-            self.table[p.key] = link
+            self.roots_table[p.key] = link
             p = next
         self.roots.delete_node(result.key)
-        del self.table[result.key]
+        del self.roots_table[result.key]
+        del self.allnodes[result.key]
         self.Min = temp#Updating the new minimu
         self.N-=1
         self.consolidate()
         return result.key
     
     def print_heap(self):
-        for key in self.table:
-            self.table[key].print_subtree(0)
+        for key in self.roots_table:
+            self.roots_table[key].print_subtree(0)
 
 dijkstra_queue = FibonacciHeap()
 for i in range(16):
@@ -155,4 +171,9 @@ print(f"New Min = {dijkstra_queue.GetMin().key}")
 dijkstra_queue.print_heap()
 print(f"Extracted Min = {dijkstra_queue.ExtractMin()}")
 print(f"New Min = {dijkstra_queue.GetMin().key}")
+dijkstra_queue.print_heap()
+dijkstra_queue.DecreaseKey(oldKey=7,newKey=2)
+dijkstra_queue.DecreaseKey(oldKey=8,newKey=1)
+dijkstra_queue.DecreaseKey(oldKey=10,newKey=0)
+print(f"after 3 DecreaseKey calls...")
 dijkstra_queue.print_heap()
