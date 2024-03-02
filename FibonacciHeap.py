@@ -21,8 +21,8 @@ class FibonacciHeap:
     def __init__(self) -> None:
         self.roots = DLL()
         self.Min = None
-        self.roots_table = {}
-        self.allnodes = {}
+        self.roots_table = {}#for quick access to root nodes
+        self.allnodes = {}#for quick access to any node
         self.N = 0
 
     def insert(self,key):
@@ -60,18 +60,25 @@ class FibonacciHeap:
         #and then must be added as a new root,
         #and this may potentialy lead to a cascading cut, if the parent
         #has already lost another child.
-        if node.parent and oldKey < node.parent.key:#TODO: consider changing it to <=
-            self.cut(node)
-            self.cascading_cut(node.parent)
+        if node.parent and newKey < node.parent.key:#TODO: consider changing it to <=
+            p = node.parent
+            self.cut(node,oldkey=oldKey)
+            self.cascading_cut(p)
+        #NOTE TO SELF: do not call consolidate! its okay to have multiple trees of same degree.
+        #Only ExtractMin should consolidate!LAZY
 
-    def cut(self,node):
-        if self.node.parent is None:
+    def cut(self,node,oldkey = None):
+        if node.parent is None:
             return
-        node.parent.children.delete_node(node.key)
+        if oldkey:#if called directly from DecreaseKey, it means that the original key
+            #was updated, and thus the parent will list the node under its previous key.
+            node.parent.children.delete_node(oldkey)
+        else:#If it comes from cascading cut, meaning no alterations to the key itself were made
+            node.parent.children.delete_node(node.key)
         node.parent = None
         node.marked = False
-        link = self.roots.addNode(node,node.key)
-        self.roots_table[node.key] = link
+        self.roots.addNode(node,node.key)
+        self.roots_table[node.key] = node
 
     def cascading_cut(self,node):
         if not node.marked:
@@ -80,7 +87,7 @@ class FibonacciHeap:
         
         while node.marked and node.parent is not None:
             p = node.parent
-            self.cut(node=node)
+            self.cut(node=node)#SHOULD disconnect node from its parent
             node = p
         
         
@@ -146,9 +153,9 @@ class FibonacciHeap:
             if treeNode.marked:
                 treeNode.marked = False
             result.children.delete_node(p.key)
-            link = self.roots.addNode(value=p.value,key=p.key)
+            self.roots.addNode(value=p.value,key=p.key)
             #FORGOT to add to roots table?Attempted fix
-            self.roots_table[p.key] = link
+            self.roots_table[p.key] = p
             p = next
         self.roots.delete_node(result.key)
         del self.roots_table[result.key]
