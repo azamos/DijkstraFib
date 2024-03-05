@@ -10,8 +10,8 @@ class DLL:
         self.end = None
         self.nodes = {}
     def addNode(self,value,key):
-        if key in self.nodes:
-            raise ValueError("DLL node with such key already exist.")
+        # if key in self.nodes:
+        #     raise ValueError("DLL node with such key already exist.")
         newNode = DLLNode(value=value,key=key)
         if self.start is None:
             self.start = self.end = newNode

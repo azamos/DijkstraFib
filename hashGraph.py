@@ -81,21 +81,21 @@ class HashedAdjListGraph:#Generic. If someone whishes to add other paramaters, h
         for edge in self.edges:
             print(edge)
 
-g = HashedAdjListGraph(directed=False)
-for i in range(10):
-    g.add_vertex(i+1)
-#g.print_graph()
+# g = HashedAdjListGraph(directed=False)
+# for i in range(10):
+#     g.add_vertex(i+1)
+# #g.print_graph()
 
-for u in g.vertices:
-    for v in g.vertices:
-        if u!=v and (u,v) not in g.edges:
-            g.add_edge(u,v,abs(u - v))
+# for u in g.vertices:
+#     for v in g.vertices:
+#         if u!=v and (u,v) not in g.edges:
+#             g.add_edge(u,v,abs(u - v))
+# # g.print_graph()
+# g.remove_vertex(6)
 # g.print_graph()
-g.remove_vertex(6)
-g.print_graph()
-edges = g.edges
-for i in range(11):
-    for j in range(11):
-        if (i,j) in g.edges:
-            g.remove_edge(i,j)
-g.print_graph()
+# edges = g.edges
+# for i in range(11):
+#     for j in range(11):
+#         if (i,j) in g.edges:
+#             g.remove_edge(i,j)
+# g.print_graph()
