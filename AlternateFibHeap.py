@@ -1,12 +1,12 @@
 from math import log2,ceil
 class TreeNode:
     def __init__(self,id,key,value) -> None:
-        self.id = id#Unique, an identifier
-        self.key = key#Not-unique,but integral to the way the heap is structured
+        self.id = id#Unique, an identifier. Must never change.
+        self.key = key#Not-unique,but integral to the way the heap is structured.Probably will change.
         self.children = {}
         self.parent = None
         self.marked = False
-        self.value = value
+        self.value = value#Can be whatever. I will use it as a pointer to a graph vertex
     
     def print_node(self,depth):
         if depth == 0:
@@ -21,11 +21,12 @@ class TreeNode:
         for childNode in self.children.values():
             childNode.print_node(depth+1)
 
-class AlteredFibonacciHeap:
+class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
     def __init__(self) -> None:
         self.root_nodes = {}
         self.nodes = {}
         self.Min = None
+        self.MaxNodes = 0
 
     def GetMin(self):
         return self.Min
@@ -38,40 +39,52 @@ class AlteredFibonacciHeap:
         self.root_nodes[new_id] = self.nodes[new_id] = newNode
         if self.Min is None or new_key < self.Min.key:
             self.Min = newNode
+        if len(self.nodes) > self.MaxNodes:
+            self.MaxNodes = len(self.nodes)
     
     def isEmpty(self):
-        return self.Min is None
+        return len(self.nodes) == 0
 
     def ExtractMin(self):
         if self.isEmpty():
             return None
         #1.First, I will remove all of Min's children and add them as roots of trees.
-        #2.Then, I will go over all roots to find the new Minimum
-        #3.Lastly, I will consolidate trees of the same degree
+        #2.Then, I will consolidate trees of the same degree.
+        #3.Lastly, I will go over all roots to find the new Minimum, if there ARE more roots.
         for child in self.Min.children.values():
             child.parent = None
             child.marked = False
             self.root_nodes[child.id] = child
-        Minimal = self.Min
-        newMin = None
-        del self.root_nodes[Minimal.id]
-        
+        if self.Min.id in self.root_nodes:
+            del self.root_nodes[self.Min.id]
+        else:
+            print("How could this be1?")
+        if self.Min.id in self.nodes:
+            del self.nodes[self.Min.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
+                                   #after their supposed removal
+        else:#THIS SOMETIMES CAUSE INFINITE LOOP. WHY?!?!?!?!?!
+            print("\nThe Min was prematurely deleted from the hashtable!\nThis can cause an infinie loop!")
+        if self.isEmpty():
+            return self.Min
+        #2.
         self._consolidate_()
+        #3.Now, all of Min's children, if there were, are either in the roots, or a children of a root node
+        newMin = None#Will temporarily hold keys until a minimum is found
         for rootNode in self.root_nodes.values():
-            if newMin is None or rootNode.key < newMin.key:
+            if newMin is None or (rootNode.key < newMin.key and rootNode.id!=self.Min.id):
                 newMin = rootNode
-        self.Min = newMin
-        del self.nodes[Minimal.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
-        #after their supposed removal
-        return Minimal 
+        ret_val = self.Min
+        self.Min = newMin#Could be None, indicating the heap is now empty
+        return ret_val
     
     def _consolidate_(self):#Goes over ALL roots and merges trees
         #assert that all TreeNodes in self.root_nodes parent is None
         nodesNoLongerRoots = {}
-        N = len(self.nodes)
+        N = max(len(self.nodes),self.MaxNodes)
         max_deg = (ceil(log2(N))+2)
-        deg_trees = [None]*(max_deg+1)
-        for treeRoot in self.root_nodes.values():
+        deg_trees = [None]*(max_deg+3)
+        for treeRoot in self.root_nodes.values():#could be source of issue, since 
+            #I am not removing a tree root immediately after merge due to still iterating over root list.
             merged_tree = treeRoot
             deg = len(merged_tree.children)
             if deg_trees[deg] is None:
@@ -91,25 +104,28 @@ class AlteredFibonacciHeap:
                         merged_tree = other_tree
                     deg_trees[deg] = None
                     deg = len(merged_tree.children)#TODO: check if works with simply deg+=1
-                    # if deg > len(deg_trees):
-                    #     print(f"deg is {deg}")
                 deg_trees[deg] = merged_tree
         for noLongerRoot_id in nodesNoLongerRoots:
-            del self.root_nodes[noLongerRoot_id]
+            del self.root_nodes[noLongerRoot_id]#could be source of bug, if new Min is here
         
     def print_heap(self):
         for root in self.root_nodes.values():
             root.print_node(0)
     
     def DecreaseKey(self,id,newKey):
+        if id not in self.nodes:
+            print(id)
+            print("ODD")
         treeNode = self.nodes[id]
         treeNode.key = newKey
+        if self.Min is None or self.Min.key > newKey:
+            self.Min = treeNode
+            self.root_nodes[treeNode.id] = treeNode
         if treeNode.parent and treeNode.key < treeNode.parent.key:
             p = treeNode.parent
             self.cut(treeNode)
             self.cascading_cut(p)
-        if self.Min and self.Min.key > newKey:
-            self.Min = treeNode
+ 
 
     def cut(self,tree_node):
         del tree_node.parent.children[tree_node.id]

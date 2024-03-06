@@ -17,6 +17,7 @@ def relax(u,v,edge_weight,Q):
 def Dijkstra(G,s):
     intialise_single_source(G=G,s=s)
     queue = AlteredFibonacciHeap()
+    S = set()
     for v in G.vertices.values():
         queue.Insert(new_id = v.id,new_key=v.key,value=v)
     while not queue.isEmpty():
@@ -24,9 +25,11 @@ def Dijkstra(G,s):
         u.value.key = u.key
         u = u.value
         for v_id in u.neighbours:
-            relax(u,G.vertices[v_id],G.edges[(u.id,v_id)].weight,queue)
+            if v_id not in S:
+                relax(u,G.vertices[v_id],G.edges[(u.id,v_id)].weight,queue)
+        S.add(u.id)
 
-N = 10
+N = 50
 G = HashedAdjListGraph()
 for i in range(1,N+1):
     G.add_vertex(u_id = i )
