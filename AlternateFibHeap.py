@@ -9,14 +9,14 @@ class TreeNode:
     
     def print_node(self,depth):
         if depth == 0:
-            print("I AM A TREE ROOT")
-            print(f"depth = {depth}, key = {self.key}, degree = {len(self.children)}")
+            print("ROOT")
+            print(f"depth = {depth}, key = {self.key}")
         else:
             if self.parent is None:
                 raise ValueError(f"parent is None but depth is NOT zero. id = {self.id}")
             print(f"depth = {depth}, key = {self.key}, parent.key = {self.parent.key}")
-            print(f"my id = {self.id}, parent id = {self.parent.id}, and i am marked = {self.marked}")
-            print(f"my degree is {len(self.children)}")
+            # print(f"my id = {self.id}, parent id = {self.parent.id}, and i am marked = {self.marked}")
+            # print(f"my degree is {len(self.children)}")
         for childNode in self.children.values():
             childNode.print_node(depth+1)
 
@@ -63,27 +63,27 @@ class AlteredFibonacciHeap:
         max_deg = (ceil(log2(N))+2)
         deg_trees = [None]*(max_deg+1)
         for treeRoot in self.root_nodes.values():
-            deg = len(treeRoot.children)
+            merged_tree = treeRoot
+            deg = len(merged_tree.children)
             if deg_trees[deg] is None:
-                deg_trees[deg] = treeRoot
+                deg_trees[deg] = merged_tree
             else:
-                merged_tree = None
                 while deg < len(deg_trees) and deg_trees[deg] is not None:
                     other_tree = deg_trees[deg]
-                    if treeRoot.key < other_tree.key:
-                        treeRoot.children[other_tree.id] = other_tree
-                        other_tree.parent = treeRoot
-                        nodesNoLongerRoots[other_tree.id] = other_tree#No longer a root
-                        merged_tree = treeRoot
+                    if merged_tree.key < other_tree.key:
+                        merged_tree.children[other_tree.id] = other_tree
+                        other_tree.parent = merged_tree
+                        nodesNoLongerRoots[other_tree.id] = other_tree.id#No longer a root
+                        #merged_tree = treeRoot
                     else:
-                        other_tree.children[treeRoot.id] = treeRoot
-                        treeRoot.parent = other_tree
-                        nodesNoLongerRoots[treeRoot.id] = treeRoot#No longer a root
+                        other_tree.children[merged_tree.id] = merged_tree
+                        merged_tree.parent = other_tree
+                        nodesNoLongerRoots[merged_tree.id] = merged_tree.id#No longer a root
                         merged_tree = other_tree
                     deg_trees[deg] = None
                     deg = len(merged_tree.children)#TODO: check if works with simply deg+=1
-                    if deg > len(deg_trees):
-                        print(f"deg is {deg}")
+                    # if deg > len(deg_trees):
+                    #     print(f"deg is {deg}")
                 deg_trees[deg] = merged_tree
         for noLongerRoot_id in nodesNoLongerRoots:
             del self.root_nodes[noLongerRoot_id]
