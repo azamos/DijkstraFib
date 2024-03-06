@@ -54,11 +54,14 @@ class AlteredFibonacciHeap:
         Minimal = self.Min
         newMin = None
         del self.root_nodes[Minimal.id]
+        
         self._consolidate_()
         for rootNode in self.root_nodes.values():
             if newMin is None or rootNode.key < newMin.key:
                 newMin = rootNode
         self.Min = newMin
+        del self.nodes[Minimal.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
+        #after their supposed removal
         return Minimal 
     
     def _consolidate_(self):#Goes over ALL roots and merges trees
@@ -123,14 +126,22 @@ class AlteredFibonacciHeap:
             tree_node = p
 
 Q = AlteredFibonacciHeap()
-for i in range(1,17):
+N = 1001
+for i in range(1,N):
     Q.Insert(i,i)
-print(f"min key is : {Q.ExtractMin().key}")
-# print(f"min key is : {Q.ExtractMin().key}")
-# print(f"min key is : {Q.ExtractMin().key}")
-# Q.DecreaseKey(6,3)
-Q.DecreaseKey(6,1)
-Q.print_heap()
-print("\n\n\n")
-print(f"min key is : {Q.ExtractMin().key}")
-Q.print_heap()
+for i in range(1,N):
+    if Q.ExtractMin().key != i:
+        print("ERROR")
+print("GOOD")
+if Q.isEmpty()==False:
+    print("BAD")
+
+for i in range(1,N):
+    Q.Insert(i,i)
+Q.ExtractMin()#To consolidate trees
+if len(Q.root_nodes) > log2(N)+1:
+    print("ERROR: Too many roots AFTER ExtractMin, which should consolidate trees")
+for treeRoot in Q.root_nodes.values():
+    if len(treeRoot.children) > log2(N)+1:
+        print("large degree tree: ")
+        print(len(treeRoot.children),log2(N)+1)
