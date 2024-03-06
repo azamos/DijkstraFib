@@ -37,8 +37,13 @@ class AlteredFibonacciHeap:
         self.root_nodes[new_id] = self.nodes[new_id] = newNode
         if self.Min is None or new_key < self.Min.key:
             self.Min = newNode
+    
+    def isEmpty(self):
+        return self.Min is None
 
     def ExtractMin(self):
+        if self.isEmpty():
+            return None
         #1.First, I will remove all of Min's children and add them as roots of trees.
         #2.Then, I will go over all roots to find the new Minimum
         #3.Lastly, I will consolidate trees of the same degree
@@ -95,7 +100,7 @@ class AlteredFibonacciHeap:
     def DecreaseKey(self,id,newKey):
         treeNode = self.nodes[id]
         treeNode.key = newKey
-        if treeNode.parent and treeNode.key > newKey:
+        if treeNode.parent and treeNode.key < treeNode.parent.key:
             p = treeNode.parent
             self.cut(treeNode)
             self.cascading_cut(p)
@@ -112,7 +117,7 @@ class AlteredFibonacciHeap:
         if tree_node.marked == False:
             tree_node.marked = True
             return
-        while tree_node and tree_node.marked:
+        while tree_node.parent and tree_node.marked:
             p = tree_node.parent
             self.cut(tree_node)
             tree_node = p
@@ -121,6 +126,11 @@ Q = AlteredFibonacciHeap()
 for i in range(1,17):
     Q.Insert(i,i)
 print(f"min key is : {Q.ExtractMin().key}")
-print(f"min key is : {Q.ExtractMin().key}")
+# print(f"min key is : {Q.ExtractMin().key}")
+# print(f"min key is : {Q.ExtractMin().key}")
+# Q.DecreaseKey(6,3)
+Q.DecreaseKey(6,1)
+Q.print_heap()
+print("\n\n\n")
 print(f"min key is : {Q.ExtractMin().key}")
 Q.print_heap()
