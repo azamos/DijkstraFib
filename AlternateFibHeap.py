@@ -1,11 +1,12 @@
 from math import log2,ceil
 class TreeNode:
-    def __init__(self,id,key) -> None:
+    def __init__(self,id,key,value) -> None:
         self.id = id#Unique, an identifier
         self.key = key#Not-unique,but integral to the way the heap is structured
         self.children = {}
         self.parent = None
         self.marked = False
+        self.value = value
     
     def print_node(self,depth):
         if depth == 0:
@@ -29,11 +30,11 @@ class AlteredFibonacciHeap:
     def GetMin(self):
         return self.Min
 
-    def Insert(self,new_id,new_key):
+    def Insert(self,new_id,new_key,value):
         if new_id in self.nodes:
             print("use another id.")
             return
-        newNode = TreeNode(id=new_id,key=new_key)
+        newNode = TreeNode(id=new_id,key=new_key,value=value)
         self.root_nodes[new_id] = self.nodes[new_id] = newNode
         if self.Min is None or new_key < self.Min.key:
             self.Min = newNode
@@ -125,23 +126,27 @@ class AlteredFibonacciHeap:
             self.cut(tree_node)
             tree_node = p
 
-Q = AlteredFibonacciHeap()
-N = 1001
-for i in range(1,N):
-    Q.Insert(i,i)
-for i in range(1,N):
-    if Q.ExtractMin().key != i:
-        print("ERROR")
-print("GOOD")
-if Q.isEmpty()==False:
-    print("BAD")
+# Q = AlteredFibonacciHeap()
+# N = 1001
+# for i in range(1,N):
+#     Q.Insert(i,i)
+# for i in range(1,N):
+#     if Q.ExtractMin().key != i:
+#         print("ERROR")
+# print("GOOD")
+# if Q.isEmpty()==False:
+#     print("BAD")
 
-for i in range(1,N):
-    Q.Insert(i,i)
-Q.ExtractMin()#To consolidate trees
-if len(Q.root_nodes) > log2(N)+1:
-    print("ERROR: Too many roots AFTER ExtractMin, which should consolidate trees")
-for treeRoot in Q.root_nodes.values():
-    if len(treeRoot.children) > log2(N)+1:
-        print("large degree tree: ")
-        print(len(treeRoot.children),log2(N)+1)
+# for i in range(1,N):
+#     Q.Insert(i,i)
+# Q.ExtractMin()#To consolidate trees
+# if len(Q.root_nodes) > log2(N)+1:
+#     print("ERROR: Too many roots AFTER ExtractMin, which should consolidate trees")
+# for treeRoot in Q.root_nodes.values():
+#     deg = len(treeRoot.children)
+#     print(f"{(treeRoot.id,treeRoot.key)} degree: {deg}")
+#     if deg > log2(N)+1:
+#         print("Problem: Tree of degree wayyy too big")
+#         print(len(treeRoot.children),log2(N)+1)
+
+#NEED TO TEST DECREASE KEY. Best solution: try implementening Dijkstra's and seeing if the result fits.

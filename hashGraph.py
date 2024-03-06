@@ -11,7 +11,7 @@ class Edge:#Generic. If someone whishes to add other paramaters,
     def __init__(self,src_id,target_id,weight = None) -> None:
         self.src_id = src_id
         self.target_id = target_id
-        self.weight = None
+        self.weight = weight
 
 class HashedAdjListGraph:#Generic. If someone whishes to add other paramaters, he can override the class
     def __init__(self,directed = True) -> None:
@@ -78,8 +78,8 @@ class HashedAdjListGraph:#Generic. If someone whishes to add other paramaters, h
     
     def print_graph(self):
         print(self.get_dimensions())
-        for edge in self.edges:
-            print(edge)
+        for edge in self.edges.values():
+            print((edge.src_id,edge.target_id),edge.weight)
 
 # g = HashedAdjListGraph(directed=False)
 # for i in range(10):
