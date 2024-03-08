@@ -22,24 +22,34 @@ def Dijkstra(G,s):
         queue.Insert(new_id = v.id,new_key=v.key,value=v)
     while not queue.isEmpty():
         u = queue.ExtractMin()
+        if u is None:
+            break
         u.value.key = u.key
         u = u.value
         for v_id in u.neighbours:
             if v_id not in S:
-                relax(u,G.vertices[v_id],G.edges[(u.id,v_id)].weight,queue)
+                relax(u,queue.nodes[v_id],G.edges[(u.id,v_id)].weight,queue)
         S.add(u.id)
+#WAS source of bug:
+#relax(u,G.vertices[v_id],G.edges[(u.id,v_id)].weight,queue)
 
-N = 50
-G = HashedAdjListGraph()
-for i in range(1,N+1):
-    G.add_vertex(u_id = i )
-#G.print_graph()
-for u in range(1,N+1):
-    for v in range(1,N+1):
-        if u!=v and (u,v) not in G.edges:
-            G.add_edge(u_id=u,v_id=v,weight=random.randint(1,101))
-#G.print_graph()
-s=G.vertices[1]
-Dijkstra(G,s=s)
-for vertex in G.vertices.values():
-    print(f"vertex {vertex.id} lightest distance from s = {s.id} is: {vertex.key}")
+def test_graph_size(N):
+    G = HashedAdjListGraph()
+    for i in range(1,N+1):
+        G.add_vertex(u_id = i )
+    #G.print_graph()
+    for u in range(1,N+1):
+        for v in range(1,N+1):
+            if u!=v and (u,v) not in G.edges:
+                G.add_edge(u_id=u,v_id=v,weight=random.randint(1,101))
+    #G.print_graph()
+    s=G.vertices[1]
+    Dijkstra(G,s=s)
+    for vertex in G.vertices.values():
+        print(f"vertex {vertex.id} lightest distance from s = {s.id} is: {vertex.key}")
+
+def main():
+    N = 100
+    test_graph_size(N)
+
+main()

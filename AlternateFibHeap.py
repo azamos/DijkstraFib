@@ -59,11 +59,6 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
             del self.root_nodes[self.Min.id]
         else:
             print("How could this be1?")
-        if self.Min.id in self.nodes:
-            del self.nodes[self.Min.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
-                                   #after their supposed removal
-        else:#THIS SOMETIMES CAUSE INFINITE LOOP. WHY?!?!?!?!?!
-            print("\nThe Min was prematurely deleted from the hashtable!\nThis can cause an infinie loop!")
         if self.isEmpty():
             return self.Min
         #2.
@@ -75,6 +70,11 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
                 newMin = rootNode
         ret_val = self.Min
         self.Min = newMin#Could be None, indicating the heap is now empty
+        if ret_val.id in self.nodes:
+            del self.nodes[ret_val.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
+                                   #after their supposed removal
+        else:#THIS SOMETIMES CAUSE INFINITE LOOP. WHY?!?!?!?!?!
+            print(f"\nThe Min {ret_val.id} was prematurely deleted from the hashtable!\nThis can cause an infinie loop!")
         return ret_val
     
     def _consolidate_(self):#Goes over ALL roots and merges trees
@@ -113,9 +113,9 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
             root.print_node(0)
     
     def DecreaseKey(self,id,newKey):
-        if id not in self.nodes:
-            print(id)
-            print("ODD")
+        # if id not in self.nodes:
+        #     print(id)
+        #     print("ODD")
         treeNode = self.nodes[id]
         treeNode.key = newKey
         if self.Min is None or self.Min.key > newKey:
