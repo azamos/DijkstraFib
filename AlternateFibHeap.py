@@ -32,9 +32,6 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
         return self.Min
 
     def Insert(self,new_id,new_key,value):
-        if new_id in self.nodes:
-            print("use another id.")
-            return
         newNode = TreeNode(id=new_id,key=new_key,value=value)
         self.root_nodes[new_id] = self.nodes[new_id] = newNode
         if self.Min is None or new_key < self.Min.key:
@@ -55,10 +52,10 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
             child.parent = None
             child.marked = False
             self.root_nodes[child.id] = child
-        if self.Min.id in self.root_nodes:
-            del self.root_nodes[self.Min.id]
-        else:
-            print("How could this be1?")
+        # if self.Min.id in self.root_nodes:
+        del self.root_nodes[self.Min.id]
+        # else:
+            # print("How could this be1?")
         if self.isEmpty():
             return self.Min
         #2.
@@ -70,11 +67,11 @@ class AlteredFibonacciHeap:#instead of DLL's, uses hashtables/dictionaries
                 newMin = rootNode
         ret_val = self.Min
         self.Min = newMin#Could be None, indicating the heap is now empty
-        if ret_val.id in self.nodes:
-            del self.nodes[ret_val.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
+        # if ret_val.id in self.nodes:
+        del self.nodes[ret_val.id]#IMPORTANT: otherwise, can't reinsert nodes with same id's
                                    #after their supposed removal
-        else:#THIS SOMETIMES CAUSE INFINITE LOOP. WHY?!?!?!?!?!
-            print(f"\nThe Min {ret_val.id} was prematurely deleted from the hashtable!\nThis can cause an infinie loop!")
+        # else:#THIS SOMETIMES CAUSE INFINITE LOOP. WHY?!?!?!?!?!
+            # print(f"\nThe Min {ret_val.id} was prematurely deleted from the hashtable!\nThis can cause an infinie loop!")
         return ret_val
     
     def _consolidate_(self):#Goes over ALL roots and merges trees

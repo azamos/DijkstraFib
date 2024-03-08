@@ -45,11 +45,13 @@ def test_graph_size(N):
     #G.print_graph()
     s=G.vertices[1]
     Dijkstra(G,s=s)
-    for vertex in G.vertices.values():
-        print(f"vertex {vertex.id} lightest distance from s = {s.id} is: {vertex.key}")
+    # for vertex in G.vertices.values():
+    #     print(f"vertex {vertex.id} lightest distance from s = {s.id} is: {vertex.key}")
 
 def main():
-    N = 100
-    test_graph_size(N)
+    for _ in range(50):
+        N = random.randint(10,1001)
+        test_graph_size(N = N)
+        print(f"for size = {N}, test was successful")
 
 main()
